@@ -7,9 +7,9 @@ interface Post extends mongoose.Document {
 
 const PostSchema: mongoose.Schema = new mongoose.Schema({
   title: String,
-  author: Boolean,
+  author: String,
 });
 
-const PostModel = mongoose.model<Post>('Todos', PostSchema);
+const PostModel = mongoose.model<Post>('Posts', PostSchema);
 
 export default PostModel;

@@ -7,6 +7,6 @@ const baseRouter = Router();
 
 baseRouter.use('/auth', authRouter);
 baseRouter.use('/user', userRouter);
-baseRouter.use('/post', postRouter);
+baseRouter.use('/posts', postRouter);
 
 export default baseRouter;
