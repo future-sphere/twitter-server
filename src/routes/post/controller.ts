@@ -14,7 +14,7 @@ const { OK } = StatusCodes;
  * @returns
  */
 export async function getAllPosts(req: Request, res: Response) {
-  const posts = await PostModel.find({});
+  const posts = await PostModel.find({}).sort({ _id: -1 });
   const result = [];
   for (let i = 0; i < posts.length; i++) {
     const authorId = posts[i].author;
