@@ -52,8 +52,8 @@ export async function login(req: Request, res: Response) {
       throw 'User is not found';
     }
 
-    // const isPasswordMatch = bcrypt.compareSync(password, user.password);
-    const isPasswordMatch = password === user.password;
+    const isPasswordMatch = bcrypt.compareSync(password, user.password);
+    // const isPasswordMatch = password === user.password;
 
     if (!isPasswordMatch) {
       throw 'Password is incorrect';
@@ -85,6 +85,12 @@ export async function register(req: Request, res: Response) {
 
     if (!password) {
       throw 'missing password';
+    }
+
+    const existingUser = await UserModel.findOne({ username });
+
+    if (existingUser) {
+      throw username + ' username is duplicated';
     }
 
     const hashedPassword = bcrypt.hashSync(password);
