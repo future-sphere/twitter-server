@@ -3,6 +3,8 @@ import { Request, Response } from 'express';
 
 import { paramMissingError } from '@shared/constants';
 import UserModel from '@schema/User';
+import jwt from 'jsonwebtoken';
+const jwtSecret = process.env.JWT_SECRET;
 
 const { BAD_REQUEST, CREATED, OK } = StatusCodes;
 
@@ -16,6 +18,28 @@ const { BAD_REQUEST, CREATED, OK } = StatusCodes;
 export async function getAllUsers(req: Request, res: Response) {
   const users = await UserModel.find({});
   return res.status(OK).json(users);
+}
+
+/**
+ * Get user by token.
+ *
+ * @param req
+ * @param res
+ * @returns
+ */
+export async function getUserByToken(req: Request, res: Response) {
+  const { token } = req.body;
+
+  if (!jwtSecret) return res.json(500).json('JWT Secret is undefined');
+
+  if (!token) return res.json(BAD_REQUEST).json('Token was not received.');
+
+  const userId = jwt.verify(token, jwtSecret);
+
+  const user = await UserModel.findById(userId).select(
+    '_id username avatar friends'
+  );
+  return res.status(OK).json(user);
 }
 
 /**

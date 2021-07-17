@@ -52,6 +52,8 @@ export async function login(req: Request, res: Response) {
       throw 'User is not found';
     }
 
+    console.log(username, password);
+
     const isPasswordMatch = bcrypt.compareSync(password, user.password);
     // const isPasswordMatch = password === user.password;
 
