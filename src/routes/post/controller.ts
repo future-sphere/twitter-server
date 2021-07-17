@@ -41,11 +41,32 @@ export async function getPostById(req: Request, res: Response) {
   const { id } = req.params;
   const post = await PostModel.findById(id);
   const author = await UserModel.findById(post?.author);
+  const commentsWithUsers = [];
+
+  if (!post || !author)
+    return res.status(BAD_REQUEST).end('Post or author not found');
+
+  for (let i = 0; i < post.comments.length; i++) {
+    const author = await UserModel.findById(post.comments[i].userId);
+    if (author) {
+      commentsWithUsers.push({
+        authorAvatar: author.avatar,
+        authorName: author.username,
+        text: post.comments[i].text,
+        createdAt: post.comments[i].createdAt,
+        likedBy: post.comments[i].likedBy,
+        commentId: post.comments[i].commentId,
+      });
+    }
+  }
+
   return res.status(OK).json({
-    _id: post?._id,
-    title: post?.title,
-    authorName: author?.username,
-    authorAvatar: author?.avatar,
+    _id: post._id,
+    title: post.title,
+    authorName: author.username,
+    authorAvatar: author.avatar,
+    comments: commentsWithUsers,
+    likedBy: post.likedBy,
   });
 }
 
