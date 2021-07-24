@@ -18,5 +18,6 @@ postRouter.put('/:postId/like', likePost);
 postRouter.put('/:postId/unlike', unlikePost);
 postRouter.post('/comment', createComment);
 postRouter.put('/:postId/comment/like', likeComment);
+postRouter.put('/:postId/comment/unlike', likeComment);
 
 export default postRouter;

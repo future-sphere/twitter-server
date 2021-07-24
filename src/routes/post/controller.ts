@@ -39,12 +39,20 @@ export async function getAllPosts(req: Request, res: Response) {
  */
 export async function getPostById(req: Request, res: Response) {
   const { id } = req.params;
-  const post = await PostModel.findById(id);
+  try {
+    const post = await getSinglePost(id);
+    return res.status(OK).json(post);
+  } catch (error) {
+    res.status(BAD_REQUEST).end(error);
+  }
+}
+
+export const getSinglePost = async (postId: string) => {
+  const post = await PostModel.findById(postId);
   const author = await UserModel.findById(post?.author);
   const commentsWithUsers = [];
 
-  if (!post || !author)
-    return res.status(BAD_REQUEST).end('Post or author not found');
+  if (!post || !author) throw 'Post or author not found';
 
   for (let i = 0; i < post.comments.length; i++) {
     const author = await UserModel.findById(post.comments[i].userId);
@@ -60,15 +68,15 @@ export async function getPostById(req: Request, res: Response) {
     }
   }
 
-  return res.status(OK).json({
+  return {
     _id: post._id,
     title: post.title,
     authorName: author.username,
     authorAvatar: author.avatar,
     comments: commentsWithUsers,
     likedBy: post.likedBy,
-  });
-}
+  };
+};
 
 /**
  * Create post with author and title.
@@ -176,7 +184,7 @@ export async function createComment(req: Request, res: Response) {
     commentId: shortid.generate(),
   };
 
-  const post = await PostModel.findByIdAndUpdate(
+  await PostModel.findByIdAndUpdate(
     postId,
     {
       $push: {
@@ -187,6 +195,8 @@ export async function createComment(req: Request, res: Response) {
       new: true,
     }
   );
+
+  const post = await getSinglePost(postId);
 
   return res.status(OK).json(post);
 }
@@ -216,6 +226,41 @@ export async function likeComment(req: Request, res: Response) {
       postId,
       {
         $push: {
+          [`comments.${commentIndex}.likedBy`]: userId,
+        },
+      },
+      { new: true }
+    );
+
+    return res.json(post);
+  }
+}
+
+/**
+ * Unlike comment
+ *
+ * @param req
+ * @param res
+ * @returns
+ */
+
+export async function unlikeComment(req: Request, res: Response) {
+  const { userId, commentId } = req.body;
+  const { postId } = req.params;
+  const found = await PostModel.findById(postId);
+
+  let commentIndex = -1;
+  found?.comments.forEach((v, i) => {
+    if (v.commentId === commentId) {
+      commentIndex = i;
+    }
+  });
+
+  if (commentIndex > -1) {
+    const post = await PostModel.findByIdAndUpdate(
+      postId,
+      {
+        $pull: {
           [`comments.${commentIndex}.likedBy`]: userId,
         },
       },
