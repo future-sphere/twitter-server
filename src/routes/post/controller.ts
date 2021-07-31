@@ -31,6 +31,23 @@ export async function getAllPosts(req: Request, res: Response) {
 }
 
 /**
+ * Delete post by id
+ *
+ * @param req
+ * @param res
+ * @returns
+ */
+export async function deletePost(req: Request, res: Response) {
+  const { postId } = req.params;
+
+  if (!postId) return res.json('No post id was supplied');
+
+  const deletedPost = await PostModel.findByIdAndDelete(postId);
+
+  return res.status(OK).json(deletedPost);
+}
+
+/**
  * Get post by id.
  *
  * @param req
@@ -199,6 +216,41 @@ export async function createComment(req: Request, res: Response) {
   const post = await getSinglePost(postId);
 
   return res.status(OK).json(post);
+}
+
+/**
+ * Create comment
+ *
+ * @param req
+ * @param res
+ * @returns
+ */
+
+export async function deleteComment(req: Request, res: Response) {
+  const { commentId } = req.body;
+  const { postId } = req.params;
+
+  const post = await PostModel.findById(postId).lean();
+
+  if (!post) return res.json('No posts found');
+
+  const commentIndexToRemove = post.comments.findIndex(
+    (v) => v.commentId === commentId
+  );
+
+  post.comments.splice(commentIndexToRemove, 1);
+
+  const newPost = await PostModel.findByIdAndUpdate(
+    postId,
+    {
+      $set: {
+        comments: post.comments,
+      },
+    },
+    { new: true }
+  );
+
+  return res.status(OK).json(newPost);
 }
 
 /**
