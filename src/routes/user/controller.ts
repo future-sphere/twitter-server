@@ -1,9 +1,10 @@
-import StatusCodes from 'http-status-codes';
+import StatusCodes, { NOT_FOUND } from 'http-status-codes';
 import { Request, Response } from 'express';
 
 import { paramMissingError } from '@shared/constants';
 import UserModel from '@schema/User';
 import jwt from 'jsonwebtoken';
+import { NOTFOUND } from 'dns';
 const jwtSecret = process.env.JWT_SECRET;
 
 const { BAD_REQUEST, CREATED, OK } = StatusCodes;
@@ -18,6 +19,23 @@ const { BAD_REQUEST, CREATED, OK } = StatusCodes;
 export async function getAllUsers(req: Request, res: Response) {
   const users = await UserModel.find({});
   return res.status(OK).json(users);
+}
+
+/**
+ * Get user by username.
+ *
+ * @param req
+ * @param res
+ * @returns
+ */
+export async function getUserByUsername(req: Request, res: Response) {
+  if (req.query.username) {
+    const users = await UserModel.findOne({
+      username: req.query.username as string,
+    });
+    return res.status(OK).json(users);
+  }
+  return res.json('Username is missing');
 }
 
 /**
