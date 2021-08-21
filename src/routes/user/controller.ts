@@ -112,3 +112,21 @@ export async function deleteOneUser(req: Request, res: Response) {
   await UserModel.findByIdAndDelete(userId);
   return res.status(OK).end();
 }
+
+/**
+ * Get users by user id list
+ *
+ * @param req
+ * @param res
+ * @returns
+ */
+export async function getUsersByIdList(req: Request, res: Response) {
+  const { userIdList } = req.query;
+
+  const users = await UserModel.find({
+    _id: {
+      $in: userIdList,
+    },
+  });
+  return res.status(OK).json(users);
+}
