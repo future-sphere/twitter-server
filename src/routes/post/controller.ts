@@ -31,6 +31,43 @@ export async function getAllPosts(req: Request, res: Response) {
 }
 
 /**
+ * Get all posts by single author by author id
+ * Resulting post need to replace authorId with author field with the author information
+ * 
+ * [
+ *  {
+ *    ...postObject,
+      author,
+      createdAt,
+ *  }
+ * ]
+ * 
+ * GET /posts/author/:authorId
+ * 
+ * @param req
+ * @param res
+ * @returns
+ */
+
+export async function getAllPostsByAuthor(req: Request, res: Response) {
+  const { authorId } = req.params;
+  const posts = await PostModel.find({ author: req.params.authorId })
+    .sort({
+      _id: -1,
+    })
+    .lean();
+  const author = await UserModel.findById(authorId).lean();
+  const result = posts.map((v) => {
+    return {
+      ...v,
+      author: author,
+    };
+  });
+
+  return res.status(OK).json(result);
+}
+
+/**
  * Delete post by id
  *
  * @param req

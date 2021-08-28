@@ -5,6 +5,7 @@ import {
   deleteComment,
   deletePost,
   getAllPosts,
+  getAllPostsByAuthor,
   getPostById,
   likeComment,
   likePost,
@@ -15,6 +16,7 @@ const postRouter = Router();
 
 postRouter.get('/', getAllPosts);
 postRouter.get('/:id', getPostById);
+postRouter.get('/author/:authorId', getAllPostsByAuthor);
 postRouter.post('/', createPost);
 postRouter.put('/:postId/like', likePost);
 postRouter.put('/:postId/unlike', unlikePost);
