@@ -8,6 +8,8 @@ interface User extends mongoose.Document {
   email: string;
   friends: [string];
   gender: number;
+  bio: string;
+  dob: Date;
 }
 
 const UserSchema: mongoose.Schema = new mongoose.Schema({
@@ -17,7 +19,9 @@ const UserSchema: mongoose.Schema = new mongoose.Schema({
   phone: String,
   email: String,
   friends: [String],
-  gender: Number
+  gender: Number,
+  bio: String,
+  dob: Date,
 });
 
 const UserModel = mongoose.model<User>('User', UserSchema);

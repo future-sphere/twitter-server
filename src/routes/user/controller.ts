@@ -86,7 +86,7 @@ export async function addOneUser(req: Request, res: Response) {
  * @returns
  */
 export async function updateOneUser(req: Request, res: Response) {
-  const { userId, field, value } = req.body;
+  const { username, bio, dob, gender, phone, email, userId } = req.body;
   if (!userId) {
     return res.status(BAD_REQUEST).json({
       error: paramMissingError,
@@ -94,7 +94,16 @@ export async function updateOneUser(req: Request, res: Response) {
   }
   const updatedUser = await UserModel.findByIdAndUpdate(
     userId,
-    { $set: { [field]: value } },
+    {
+      $set: {
+        username,
+        bio,
+        dob,
+        gender,
+        phone,
+        email,
+      },
+    },
     { new: true }
   );
   return res.status(OK).json(updatedUser);
